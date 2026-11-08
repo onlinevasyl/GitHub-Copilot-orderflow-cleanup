@@ -1,57 +1,57 @@
 import datetime
 # order processor v2.3 - last updated by dave
 
-d = 0.1  # discount
+discount_rate = 0.1  # discount
 
-def proc(o):
+def proc(order):
     # process order
-    t = 0
-    for i in o["items"]:
-        p = i["p"]
-        q = i["q"]
-        if q < 0:
-            q = 0
-        if p < 0:
-            p = 0
-        t = t + (p * q)
+    subtotal = 0
+    for item in order["items"]:
+        price = item["p"]
+        quantity = item["q"]
+        if quantity < 0:
+            quantity = 0
+        if price < 0:
+            price = 0
+        subtotal = subtotal + (price * quantity)
 
-    if o.get("c") == "VIP":
+    if order.get("c") == "VIP":
         # VIP discount
-        t = t - (t * d)
-        t = round(t, 2)
-    elif o.get("c") == "EMPLOYEE":
+        subtotal = subtotal - (subtotal * discount_rate)
+        subtotal = round(subtotal, 2)
+    elif order.get("c") == "EMPLOYEE":
         # employee discount 20%
-        t = t - (t * 0.2)
-        t = round(t, 2)
-    elif o.get("c") == "WHOLESALE":
-        t = t - (t * 0.25)
-        t = round(t, 2)
+        subtotal = subtotal - (subtotal * 0.2)
+        subtotal = round(subtotal, 2)
+    elif order.get("c") == "WHOLESALE":
+        subtotal = subtotal - (subtotal * 0.25)
+        subtotal = round(subtotal, 2)
 
     # tax
-    tax = t * 0.08
+    tax = subtotal * 0.08
     tax = round(tax, 2)
-    t = t + tax
-    t = round(t, 2)
+    subtotal = subtotal + tax
+    subtotal = round(subtotal, 2)
 
     # build result
-    r = {}
-    r["order_id"] = o["id"]
-    r["dt"] = str(datetime.datetime.now())
-    r["sub"] = round(t - tax, 2)
-    r["tax"] = tax
-    r["total"] = t
-    r["st"] = "COMPLETED"
+    result = {}
+    result["order_id"] = order["id"]
+    result["dt"] = str(datetime.datetime.now())
+    result["sub"] = round(subtotal - tax, 2)
+    result["tax"] = tax
+    result["total"] = subtotal
+    result["st"] = "COMPLETED"
 
-    if t > 1000:
-        r["st"] = "REVIEW_REQUIRED"
+    if subtotal > 1000:
+        result["st"] = "REVIEW_REQUIRED"
 
-    if len(o["items"]) == 0:
-        r["st"] = "EMPTY"
-        r["sub"] = 0
-        r["tax"] = 0
-        r["total"] = 0
+    if len(order["items"]) == 0:
+        result["st"] = "EMPTY"
+        result["sub"] = 0
+        result["tax"] = 0
+        result["total"] = 0
 
-    return r
+    return result
 
 
 def proc_batch(orders):
@@ -68,7 +68,7 @@ def proc_batch(orders):
             t = t + (p * q)
 
         if o.get("c") == "VIP":
-            t = t - (t * d)
+            t = t - (t * discount_rate)
             t = round(t, 2)
         elif o.get("c") == "EMPLOYEE":
             t = t - (t * 0.2)
