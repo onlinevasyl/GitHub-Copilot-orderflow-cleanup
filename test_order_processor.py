@@ -4,7 +4,7 @@
 
 import datetime
 
-from order_processor import proc
+from order_processor import proc, proc_batch
 
 
 def assert_result(result, expected):
@@ -111,3 +111,21 @@ def test_negative_item_quantity_is_treated_as_zero_for_calculation():
             "st": "COMPLETED",
         },
     )
+
+
+def test_proc_batch_returns_three_results_with_expected_order_ids():
+    orders = [
+        {"id": "standard-1", "items": [{"p": 10, "q": 2}]},
+        {"id": "vip-1", "items": [{"p": 100, "q": 1}], "c": "VIP"},
+        {"id": "employee-1", "items": [{"p": 100, "q": 1}], "c": "EMPLOYEE"},
+    ]
+
+    results = proc_batch(orders)
+
+    assert isinstance(results, list)
+    assert len(results) == 3
+    assert [result["order_id"] for result in results] == [
+        "standard-1",
+        "vip-1",
+        "employee-1",
+    ]
