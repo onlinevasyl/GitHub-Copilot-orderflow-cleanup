@@ -25,7 +25,13 @@ REVIEW_THRESHOLD = 1000
 import datetime
 # order processor v2.3 - last updated by dave
 
-discount_rate = VIP_DISCOUNT_RATE  # discount
+def calculate_discount(subtotal, customer_type):
+    if customer_type not in DISCOUNT_RATES:
+        return subtotal
+
+    discount_rate = DISCOUNT_RATES[customer_type]
+    return round(subtotal - (subtotal * discount_rate), 2)
+
 
 def proc(order):
     # process order
@@ -39,17 +45,7 @@ def proc(order):
             price = 0
         subtotal = subtotal + (price * quantity)
 
-    if order.get("c") == "VIP":
-        # VIP discount
-        subtotal = subtotal - (subtotal * VIP_DISCOUNT_RATE)
-        subtotal = round(subtotal, 2)
-    elif order.get("c") == "EMPLOYEE":
-        # employee discount 20%
-        subtotal = subtotal - (subtotal * EMPLOYEE_DISCOUNT_RATE)
-        subtotal = round(subtotal, 2)
-    elif order.get("c") == "WHOLESALE":
-        subtotal = subtotal - (subtotal * WHOLESALE_DISCOUNT_RATE)
-        subtotal = round(subtotal, 2)
+    subtotal = calculate_discount(subtotal, order.get("c"))
 
     # tax
     tax = subtotal * TAX_RATE

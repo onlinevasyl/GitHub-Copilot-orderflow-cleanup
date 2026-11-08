@@ -4,7 +4,9 @@
 
 import datetime
 
-from order_processor import proc, proc_batch
+import pytest
+
+from order_processor import calculate_discount, proc, proc_batch
 
 
 def assert_result(result, expected):
@@ -129,3 +131,18 @@ def test_proc_batch_returns_three_results_with_expected_order_ids():
         "vip-1",
         "employee-1",
     ]
+
+
+@pytest.mark.parametrize(
+    ("customer_type", "expected_subtotal"),
+    [
+        ("VIP", 90.0),
+        ("EMPLOYEE", 80.0),
+        ("WHOLESALE", 75.0),
+        ("STANDARD", 100),
+    ],
+)
+def test_calculate_discount_uses_customer_type_mapping(
+    customer_type, expected_subtotal
+):
+    assert calculate_discount(100, customer_type) == expected_subtotal
