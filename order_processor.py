@@ -115,3 +115,25 @@ def gen_report(results):
     s = s + "Grand Total: $" + str(round(tt, 2)) + "\n"
     s = s + "Orders: " + str(len(results)) + "\n"
     return s
+
+
+
+# === CODE REVIEW NOTES === 
+
+# 1. Variable names: d, o, t, p, q, r, s, tt — all cryptic, single-letter 
+
+# 2. proc() and proc_batch() contain nearly identical logic (copy-paste duplication) 
+
+# 3. Discount rates are hardcoded magic numbers (0.1, 0.2, 0.25) 
+
+# 4. Tax rate (0.08) is a magic number buried in logic 
+
+# 5. No docstrings, no type hints, no meaningful comments 
+
+# 6. Empty order check happens AFTER calculation (wrong order of operations) 
+
+# 7. gen_report() uses string concatenation instead of f-strings or templates 
+
+# 8. No unit tests exist 
+
+# 9. No README or module-level documentation 
